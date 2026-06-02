@@ -1,96 +1,328 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO.Pipelines;
+using System.Net;
+using System.Runtime;
+using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
+using System.Security.Cryptography.X509Certificates;
+using System.Transactions;
+using Spectre.Console;
 
-class Program
+namespace BudgetManagementSystem
 {
-    static List<string> transactions = new List<string>();
-
-    static void Main()
+    class CannotBeEmptyException : Exception
     {
-        bool running = true;
-
-        while (running)
+        public CannotBeEmptyException(string message) : base(message)
         {
-            ShowMenu();
 
-            Console.Write("Select an option: ");
-            string choice = Console.ReadLine();
+        }
+    }
 
-            switch (choice)
+    public class Transaction
+    {
+        // Properties
+        public required string Description { get; set; }
+        public decimal Amount { get; set; }
+
+        public required Category CategoryName { get; set; }
+
+        public DateTime Date { get; init; }
+
+    }
+
+    public class Category
+    {
+        public required string Name { get; init; }
+
+        public decimal BudgetLimit { get; set; }
+
+        public decimal RemainingBudget { get; set; }
+
+    }
+
+    class Program()
+    {
+
+        static List<Transaction> transactions = new List<Transaction>();
+        static List<Category> categories = new()
+        {
+            new Category { Name = "Food" },
+            new Category { Name = "Transportation" },
+            new Category { Name = "Shopping" },
+            new Category { Name = "Travel" },
+            new Category { Name = "Miscellaneous" }
+        };
+
+        static decimal budgetLimit = new();
+        
+
+        static void Main()
+        {
+            bool exit = false;
+
+            Greeting();
+
+            while (!exit)
             {
-                case "1":
-                    ViewTransactions();
-                    break;
+                DisplayMenu();
 
-                case "2":
-                    AddTransaction();
-                    break;
+                var userChoice = Console.ReadLine();
 
-                case "3":
+                if (int.TryParse(userChoice, out int intUserChoice))
+                {
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[red]Invalid input. Please enter a number.[/]");
+                }
 
-                    Console.WriteLine("Exiting program...");
-                    running = false;
-                    break;
 
-                default:
-                    Console.WriteLine("Invalid option. Try again.");
-                    break;
+                switch (intUserChoice)
+                {
+                    case 1:
+                        ViewTransactions();
+                        PromptUser();
+                        break;
+                    case 2:
+                        AddTransactions();
+                        PromptUser();
+                        break;
+                    case 3:
+                        RemoveTransactions();
+                        PromptUser();
+                        break;
+                    case 4:
+                        Budget();
+                        PromptUser();
+                        break;
+                    case 5:
+                        // 
+                        break;
+                    case 6:
+                        Environment.Exit(0);
+                        break;
+                    default:
+                        continue;
+                }
+            }
+
+            Console.ReadKey();
+
+            static void Greeting()
+            {
+                AnsiConsole.MarkupLine("\n[bold]Welcome to the 은행: Budget Tracker[/]");
+                AnsiConsole.MarkupLine(@"[bold green]
+............. ....      ............... 
+... ............... ....................
+.....#%######............-#%:....=##.=##
+...%##:....-%#+......-##########.=##.=##
+...##=......:##........##:..-##..=######
+...*##-....-##=.......*#*....%#=.=##.=##
+.....+######*..........##*..###..=##.=##
+........................-###*:...=##.=##
+##################=  .... ...-%######-..
+..--................    .. .###.....*##.
+..##:........ ......    ...:##.......##-
+..##:.............. .   ....**#:...:##*.
+..##############=..     ......=#####+...
+...................     ............... [/]");
+            }
+
+            static void DisplayMenu()
+            {
+                Console.WriteLine("\n========================================");
+                AnsiConsole.MarkupLine("[bold yellow]1. See all transactions[/]");
+                AnsiConsole.MarkupLine("[bold green]2. Add a new transaction[/]");
+                AnsiConsole.MarkupLine("[bold red]3. Remove a transaction[/]");
+                AnsiConsole.MarkupLine("[bold deepskyblue1]4. Set a budget[/]");
+                AnsiConsole.MarkupLine("[bold cyan]5. Export transaction data[/]");
+                AnsiConsole.MarkupLine("[bold magenta]6. Exit[/]");
+                Console.WriteLine("========================================\n");
+            }
+
+            static void PrintSelectedOption(string selectedOption)
+            {
+                Console.WriteLine($"Selected option: {selectedOption}");
+            }
+
+            static void PromptUser()
+            {
+                Console.WriteLine("\nWhat do you want to do?");
+            }
+
+        }
+
+        static void ViewTransactions()
+        {
+            Transaction allTransactions = transactions[0];
+            if (transactions.Count == 0)
+            {
+                Console.WriteLine("\n No transactions have been added yet");
+            }
+            for (int i = 0; i < transactions.Count; i++)
+            {
+                {
+                    Console.WriteLine($"{i + 1}. \t Description: {transactions[i].Description} \n \t Amount: ${transactions[i].Amount} \n \t Category: {transactions[i].CategoryName.Name} \n \t Date: {transactions[i].Date} \n");
+                    
+                }
             }
         }
-    }
 
-    // 1. User-Friendly Menu Interface
-    static void ShowMenu()
-    {
-        Console.WriteLine("\n==== TRANSACTION MENU ====");
-        Console.WriteLine("1. View Transactions");
-        Console.WriteLine("2. Add Transaction");
-        Console.WriteLine("3. Exit");
-        Console.WriteLine("==========================");
-    }
-
-    // 2. View Transactions
-    static void ViewTransactions()
-    {
-        Console.WriteLine("\n--- Transaction List ---");
-
-        if (transactions.Count == 0)
+        static Category DisplayCategories()
         {
-            Console.WriteLine("No transactions found.");
 
-            return;
+            Console.WriteLine("Please choose a category: ");
+            for (int i = 0; i < categories.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {categories[i].Name}");
+
+            }
+            string userInput = Console.ReadLine();
+            if (int.TryParse(userInput, out int selectedCategory))
+            {
+                return categories[selectedCategory - 1];
+            }
+
+            return null;
         }
 
-        int index = 1;
-
-        foreach (var t in transactions)
+        static void AddTransactions()
         {
-            Console.WriteLine($"{index}. {t}");
-            index++;
+            Console.WriteLine("Enter the transaction description: ");
+            string description = "";
+            decimal decimalAmount = 0;
+            Category selectedCategory = null;
+            DateTime currentTime = DateTime.Now;
+
+            description = Console.ReadLine();
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(description))
+                {
+                    throw new CannotBeEmptyException("The description cannot be empty.");
+                    
+                }
+
+            }
+            catch (CannotBeEmptyException)
+            {
+                AnsiConsole.MarkupLine("[red]Description cannot be empty[/]");
+            }
+
+            while (true)
+            {
+                Console.WriteLine("Enter the transaction amount: ");
+                string amount = Console.ReadLine(); // decimals need an m appended at the end if the value is money
+
+                if (decimal.TryParse(amount, out decimalAmount))
+                {
+                    break;
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[red]Please input a decimal value.[/]");
+                    continue;
+                }
+            }
+
+            selectedCategory = DisplayCategories();
+
+
+            // Time 
+            AnsiConsole.MarkupLine("\n[green]Transaction has been successfully saved.[/]\n");
+            Console.WriteLine($"{currentTime}");
+
+
+
+            // Add the transaction
+            Transaction newTransaction = new Transaction()
+            {
+                Description = description,
+                Amount = decimalAmount,
+                CategoryName = selectedCategory,
+                Date = currentTime
+            };
+
+            transactions.Add(newTransaction);
+
+            TransactionReport(selectedCategory, newTransaction, true);
         }
-    }
 
-    // 3. Add Transactions
-    static void AddTransaction()
-    {
-        Console.Write("Enter transaction description: ");
-        string description = Console.ReadLine();
-
-        Console.Write("Enter amount: ");
-        string amountInput = Console.ReadLine();
-
-        // Validation using conditional
-        if (double.TryParse(amountInput, out double amount))
+        static void TransactionReport(Category selectedCategoryName, Transaction transactionInfo, bool isAdding)
         {
-            string record = $"{description} - {amount}";
-            transactions.Add(record);
+            
+            decimal budget = selectedCategoryName.BudgetLimit;
+            decimal amountSpent = transactionInfo.Amount;
+            decimal remaining = selectedCategoryName.RemainingBudget;
 
-            Console.WriteLine("Transaction added successfully!");
+            if (isAdding == true)
+            {
+                selectedCategoryName.RemainingBudget = budget - amountSpent;
+            }
+            else
+            {
+                selectedCategoryName.RemainingBudget = selectedCategoryName.RemainingBudget + amountSpent;
+            }
+
+            AnsiConsole.MarkupLine($"[green]Budget: {budget}[/]");
+            AnsiConsole.MarkupLine($"[red]Amount spent: {amountSpent}[/]");
+            if (selectedCategoryName.RemainingBudget < 0)
+            {
+                AnsiConsole.MarkupLine($"[red]Remaining: {selectedCategoryName.RemainingBudget}[/]");
+            }
+            else
+            {
+                AnsiConsole.MarkupLine($"[yellow]Remaining: {selectedCategoryName.RemainingBudget}[/]");
+            }
+        
         }
 
-        else
+        static void Budget()
         {
-            Console.WriteLine("Invalid amount. Transaction not saved.");
+            // BudgetLimit
+            Category selectedCategory = DisplayCategories();
+            Console.WriteLine($"What is your budget for {selectedCategory.Name}?: ");
+            string userBudget = Console.ReadLine();
+
+            if (decimal.TryParse(userBudget, out decimal budgetLimit))
+            {
+                selectedCategory.BudgetLimit = budgetLimit;
+                AnsiConsole.MarkupLine($"[green] Your budget for the {selectedCategory.Name} category is: ${budgetLimit}[/]");
+            } 
+
         }
+
+        static void RemoveTransactions()
+        {
+            Transaction transactionToRemove = transactions[0];
+            Console.WriteLine("Select the index of the transaction you want to remove: ");
+            string removeTransaction = Console.ReadLine();
+            if (int.TryParse(removeTransaction, out int removeTransactionInt))
+            {
+                transactionToRemove = transactions[removeTransactionInt - 1];
+                AnsiConsole.MarkupLine($"[red]\ntransaction removed: {removeTransaction}\n[/]");
+            }
+            else
+            {
+                Console.WriteLine("\nThe given index is not valid.\n");
+            }
+
+            // Transaction report would go here
+            TransactionReport(transactionToRemove.CategoryName, transactionToRemove, false);
+        }
+
+        // Export transactions to csv file: coming soon
+        static void ExportTransactions()
+        {
+            Transaction allTransactions = transactions[0];
+            
+            ViewTransactions();
+            // string jsonString = JsonSerializer.Serialize();
+
+        }
+
+
     }
 }
