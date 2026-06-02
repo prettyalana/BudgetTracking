@@ -162,7 +162,6 @@ namespace BudgetManagementSystem
 
         static void ViewTransactions()
         {
-            Transaction allTransactions = transactions[0];
             if (transactions.Count == 0)
             {
                 Console.WriteLine("\n No transactions have been added yet");
@@ -333,6 +332,7 @@ namespace BudgetManagementSystem
         static void ExportTransactions()
         {
 
+            // TODO: Refactor and add transaction report data
             string path = "budgettracker.csv";
 
             StringBuilder output = new StringBuilder();
