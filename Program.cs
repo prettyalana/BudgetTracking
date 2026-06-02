@@ -6,6 +6,7 @@ using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Transactions;
 using Spectre.Console;
 
@@ -55,7 +56,7 @@ namespace BudgetManagementSystem
         };
 
         static decimal budgetLimit = new();
-        
+
 
         static void Main()
         {
@@ -97,9 +98,14 @@ namespace BudgetManagementSystem
                         PromptUser();
                         break;
                     case 5:
-                        // 
+                        ViewBudget();
+                        PromptUser();
                         break;
                     case 6:
+                        ExportTransactions();
+                        PromptUser();
+                        break;
+                    case 7:
                         Environment.Exit(0);
                         break;
                     default:
@@ -136,8 +142,9 @@ namespace BudgetManagementSystem
                 AnsiConsole.MarkupLine("[bold green]2. Add a new transaction[/]");
                 AnsiConsole.MarkupLine("[bold red]3. Remove a transaction[/]");
                 AnsiConsole.MarkupLine("[bold deepskyblue1]4. Set a budget[/]");
-                AnsiConsole.MarkupLine("[bold cyan]5. Export transaction data[/]");
-                AnsiConsole.MarkupLine("[bold magenta]6. Exit[/]");
+                AnsiConsole.MarkupLine("[bold cyan]5. View budget[/]");
+                AnsiConsole.MarkupLine("[bold deeppink1]6. Export transaction data[/]");
+                AnsiConsole.MarkupLine("[bold magenta]7. Exit[/]");
                 Console.WriteLine("========================================\n");
             }
 
@@ -164,7 +171,7 @@ namespace BudgetManagementSystem
             {
                 {
                     Console.WriteLine($"{i + 1}. \t Description: {transactions[i].Description} \n \t Amount: ${transactions[i].Amount} \n \t Category: {transactions[i].CategoryName.Name} \n \t Date: {transactions[i].Date} \n");
-                    
+
                 }
             }
         }
@@ -202,7 +209,7 @@ namespace BudgetManagementSystem
                 if (string.IsNullOrWhiteSpace(description))
                 {
                     throw new CannotBeEmptyException("The description cannot be empty.");
-                    
+
                 }
 
             }
@@ -231,8 +238,7 @@ namespace BudgetManagementSystem
 
 
             // Time 
-            AnsiConsole.MarkupLine("\n[green]Transaction has been successfully saved.[/]\n");
-            Console.WriteLine($"{currentTime}");
+            AnsiConsole.MarkupLine($"\n[green]Transaction has been successfully saved at: {currentTime}[/]\n");
 
 
 
@@ -252,7 +258,7 @@ namespace BudgetManagementSystem
 
         static void TransactionReport(Category selectedCategoryName, Transaction transactionInfo, bool isAdding)
         {
-            
+
             decimal budget = selectedCategoryName.BudgetLimit;
             decimal amountSpent = transactionInfo.Amount;
             decimal remaining = selectedCategoryName.RemainingBudget;
@@ -276,7 +282,7 @@ namespace BudgetManagementSystem
             {
                 AnsiConsole.MarkupLine($"[yellow]Remaining: {selectedCategoryName.RemainingBudget}[/]");
             }
-        
+
         }
 
         static void Budget()
@@ -290,7 +296,18 @@ namespace BudgetManagementSystem
             {
                 selectedCategory.BudgetLimit = budgetLimit;
                 AnsiConsole.MarkupLine($"[green] Your budget for the {selectedCategory.Name} category is: ${budgetLimit}[/]");
-            } 
+            }
+
+        }
+
+        static void ViewBudget()
+        {
+            Console.WriteLine("========================================");
+            foreach (Category categoryName in categories)
+            {
+                AnsiConsole.MarkupLine($"[springgreen1]{categoryName.Name}: {categoryName.BudgetLimit}[/]");
+            }
+            Console.WriteLine("========================================");
 
         }
 
@@ -302,6 +319,7 @@ namespace BudgetManagementSystem
             if (int.TryParse(removeTransaction, out int removeTransactionInt))
             {
                 transactionToRemove = transactions[removeTransactionInt - 1];
+                transactions.RemoveAt(removeTransactionInt - 1);
                 AnsiConsole.MarkupLine($"[red]\ntransaction removed: {removeTransaction}\n[/]");
             }
             else
@@ -309,17 +327,40 @@ namespace BudgetManagementSystem
                 Console.WriteLine("\nThe given index is not valid.\n");
             }
 
-            // Transaction report would go here
+
             TransactionReport(transactionToRemove.CategoryName, transactionToRemove, false);
         }
-
-        // Export transactions to csv file: coming soon
         static void ExportTransactions()
         {
-            Transaction allTransactions = transactions[0];
-            
-            ViewTransactions();
-            // string jsonString = JsonSerializer.Serialize();
+
+            string path = "budgettracker.csv";
+
+            StringBuilder output = new StringBuilder();
+
+            string header = $"Description | Amount | Category | Date ";
+            output.AppendLine(header);
+            for (int i = 0; i < transactions.Count; i++)
+            {
+                
+                string csvData = $"{transactions[i].Description}, ${transactions[i].Amount}, {transactions[i].CategoryName.Name}, {transactions[i].Date}";
+
+                output.AppendLine(csvData);
+            }
+
+            header = "\nBudget";
+            output.AppendLine(header);
+            foreach (Category transactionCategory in categories)
+            {
+                string budget = $"{transactionCategory.Name}: {transactionCategory.BudgetLimit} \n";
+
+                output.AppendLine(budget);
+            }
+
+            // TransactionReport(transactionToRemove.CategoryName, transactionToRemove, false);
+            AnsiConsole.MarkupLine("[green]CSV file was successfully created.[/]");
+            File.AppendAllText(path, output.ToString());
+
+
 
         }
 
