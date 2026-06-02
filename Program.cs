@@ -220,7 +220,7 @@ namespace BudgetManagementSystem
             while (true)
             {
                 Console.WriteLine("Enter the transaction amount: ");
-                string amount = Console.ReadLine(); // decimals need an m appended at the end if the value is money
+                string amount = Console.ReadLine();
 
                 if (decimal.TryParse(amount, out decimalAmount))
                 {
