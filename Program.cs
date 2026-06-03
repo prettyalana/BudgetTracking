@@ -109,6 +109,8 @@ namespace BudgetManagementSystem
                         Environment.Exit(0);
                         break;
                     default:
+                        AnsiConsole.MarkupLine("[red]Incorrect choice.[/]");
+                        AnsiConsole.MarkupLine("[red]Please make a choice between numbers 1-7.[/]");
                         continue;
                 }
             }
@@ -164,7 +166,7 @@ namespace BudgetManagementSystem
         {
             if (transactions.Count == 0)
             {
-                Console.WriteLine("\n No transactions have been added yet");
+                AnsiConsole.MarkupLine("[red]No transactions have been added yet.[/]");
             }
             for (int i = 0; i < transactions.Count; i++)
             {
@@ -195,26 +197,23 @@ namespace BudgetManagementSystem
 
         static void AddTransactions()
         {
-            Console.WriteLine("Enter the transaction description: ");
             string description = "";
             decimal decimalAmount = 0;
             Category selectedCategory = null;
             DateTime currentTime = DateTime.Now;
 
-            description = Console.ReadLine();
-
-            try
+            while (true)
             {
+                Console.WriteLine("Enter the transaction description: ");
+                description = Console.ReadLine();
+
                 if (string.IsNullOrWhiteSpace(description))
                 {
-                    throw new CannotBeEmptyException("The description cannot be empty.");
-
+                    AnsiConsole.MarkupLine("[red]Description cannot be empty[/]");
+                    continue;
                 }
 
-            }
-            catch (CannotBeEmptyException)
-            {
-                AnsiConsole.MarkupLine("[red]Description cannot be empty[/]");
+                break;
             }
 
             while (true)
@@ -303,7 +302,7 @@ namespace BudgetManagementSystem
                 if (item.CategoryName.Name.ToString() == selectedCategory.Name)
                 {
                     transactionTotal += item.Amount;
-                    
+
                 }
             }
 
@@ -315,6 +314,24 @@ namespace BudgetManagementSystem
             }
 
 
+        }
+
+        // This method is needed for transactionreport, budget, and view budget
+        static void DynamicBudget(Category categoryBudget)
+        {
+            
+            // decimal transactionTotal = 0;
+            // Category selectedCategory = DisplayCategories();
+            // foreach (Transaction item in transactions)
+            // {
+            //     if (item.CategoryName.Name.ToString() == selectedCategory.Name)
+            //     {
+            //         transactionTotal += item.Amount;
+
+            //         decimal budgetTotal = budgetLimit - transactionTotal;
+
+            //     }
+            // }
         }
 
         static void ViewBudget()
@@ -355,7 +372,7 @@ namespace BudgetManagementSystem
 
             StringBuilder output = new StringBuilder();
 
-            string header = $"Description | Amount | Category | Date ";
+            string header = "Description, Amount, Category, Date";
             output.AppendLine(header);
             for (int i = 0; i < transactions.Count; i++)
             {
