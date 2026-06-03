@@ -240,7 +240,6 @@ namespace BudgetManagementSystem
             AnsiConsole.MarkupLine($"\n[green]Transaction has been successfully saved at: {currentTime}[/]\n");
 
 
-
             // Add the transaction
             Transaction newTransaction = new Transaction()
             {
@@ -252,7 +251,15 @@ namespace BudgetManagementSystem
 
             transactions.Add(newTransaction);
 
-            TransactionReport(selectedCategory, newTransaction, true);
+
+            if (selectedCategory.BudgetLimit == 0)
+            {
+
+            }
+            else
+            {
+                TransactionReport(selectedCategory, newTransaction, true);
+            }
         }
 
         static void TransactionReport(Category selectedCategoryName, Transaction transactionInfo, bool isAdding)
@@ -260,7 +267,6 @@ namespace BudgetManagementSystem
 
             decimal budget = selectedCategoryName.BudgetLimit;
             decimal amountSpent = transactionInfo.Amount;
-            decimal remaining = selectedCategoryName.RemainingBudget;
 
             if (isAdding == true)
             {
@@ -287,15 +293,27 @@ namespace BudgetManagementSystem
         static void Budget()
         {
             // BudgetLimit
+            decimal transactionTotal = 0;
             Category selectedCategory = DisplayCategories();
             Console.WriteLine($"What is your budget for {selectedCategory.Name}?: ");
             string userBudget = Console.ReadLine();
 
+            foreach (Transaction item in transactions)
+            {
+                if (item.CategoryName.Name.ToString() == selectedCategory.Name)
+                {
+                    transactionTotal += item.Amount;
+                    
+                }
+            }
+
             if (decimal.TryParse(userBudget, out decimal budgetLimit))
             {
                 selectedCategory.BudgetLimit = budgetLimit;
-                AnsiConsole.MarkupLine($"[green] Your budget for the {selectedCategory.Name} category is: ${budgetLimit}[/]");
+                decimal budgetTotal = budgetLimit - transactionTotal;
+                AnsiConsole.MarkupLine($"[green] Your budget for the {selectedCategory.Name} category is: ${budgetTotal}[/]");
             }
+
 
         }
 
@@ -341,7 +359,7 @@ namespace BudgetManagementSystem
             output.AppendLine(header);
             for (int i = 0; i < transactions.Count; i++)
             {
-                
+
                 string csvData = $"{transactions[i].Description}, ${transactions[i].Amount}, {transactions[i].CategoryName.Name}, {transactions[i].Date}";
 
                 output.AppendLine(csvData);
