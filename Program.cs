@@ -4,6 +4,8 @@ using Spectre.Console;
 
 namespace BudgetManagementSystem
 {
+
+    // Custom exception that will be used later
     class CannotBeEmptyException : Exception
     {
         public CannotBeEmptyException(string message) : base(message)
@@ -307,7 +309,7 @@ namespace BudgetManagementSystem
 
         }
 
-        // This method is needed for transactionreport, budget, and view budget
+        // This method is needed for transactionreport, budget, view budget, and export transactions
         static decimal DynamicBudget(Category categoryBudget)
         {
             decimal transactionTotal = 0;
@@ -376,7 +378,7 @@ namespace BudgetManagementSystem
             for (int i = 0; i < transactions.Count; i++)
             {
 
-                string csvData = $"{transactions[i].Description}, {transactions[i].CategoryName.Name}, {budgetAmount.BudgetLimit}, {DynamicBudget(budgetAmount)}, { budgetAmount.BudgetLimit - DynamicBudget(budgetAmount)}, {transactions[i].Date}";
+                string csvData = $"{transactions[i].Description}, {transactions[i].CategoryName.Name}, {budgetAmount.BudgetLimit}, {DynamicBudget(budgetAmount)}, {budgetAmount.BudgetLimit - DynamicBudget(budgetAmount)}, {transactions[i].Date}";
 
                 output.AppendLine(csvData);
             }
