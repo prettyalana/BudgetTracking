@@ -5,15 +5,6 @@ using Spectre.Console;
 namespace BudgetManagementSystem
 {
 
-    // Custom exception that will be used later
-    class CannotBeEmptyException : Exception
-    {
-        public CannotBeEmptyException(string message) : base(message)
-        {
-
-        }
-    }
-
     public class Transaction
     {
         // Properties
@@ -31,6 +22,11 @@ namespace BudgetManagementSystem
         public required string Name { get; init; }
 
         public decimal BudgetLimit { get; set; }
+
+    }
+
+    public class Budget
+    {
 
     }
 
@@ -369,22 +365,31 @@ namespace BudgetManagementSystem
         static void ExportTransactions(Category budgetAmount)
         {
 
-            string path = "budgettracker.csv";
-
-            StringBuilder output = new StringBuilder();
-
-            string header = "Description, Category, Budget, Amount Spent, Total, Date";
-            output.AppendLine(header);
-            for (int i = 0; i < transactions.Count; i++)
+            try
             {
+                string path = "budgettracker.csv";
 
-                string csvData = $"{transactions[i].Description}, {transactions[i].CategoryName.Name}, {budgetAmount.BudgetLimit}, {DynamicBudget(budgetAmount)}, {budgetAmount.BudgetLimit - DynamicBudget(budgetAmount)}, {transactions[i].Date}";
+                StringBuilder output = new StringBuilder();
 
-                output.AppendLine(csvData);
+                string header = "Description, Category, Budget, Amount Spent, Total, Date";
+                output.AppendLine(header);
+
+                for (int i = 0; i < transactions.Count; i++)
+                {
+
+                    string csvData = $"{transactions[i].Description}, {transactions[i].CategoryName.Name}, {budgetAmount.BudgetLimit}, {DynamicBudget(budgetAmount)}, {budgetAmount.BudgetLimit - DynamicBudget(budgetAmount)}, {transactions[i].Date}";
+
+                    output.AppendLine(csvData);
+                }
+
+                File.AppendAllText(path, output.ToString());
+                AnsiConsole.MarkupLine("[green]CSV file was successfully created.[/]");
             }
-
-            AnsiConsole.MarkupLine("[green]CSV file was successfully created.[/]");
-            File.AppendAllText(path, output.ToString());
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine("[red]Export failed[/]");
+                AnsiConsole.WriteException(ex);
+            }
 
 
 
