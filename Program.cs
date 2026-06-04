@@ -30,8 +30,6 @@ namespace BudgetManagementSystem
 
         public decimal BudgetLimit { get; set; }
 
-        public decimal RemainingBudget { get; set; }
-
     }
 
     class Program()
@@ -251,11 +249,11 @@ namespace BudgetManagementSystem
             }
             else
             {
-                TransactionReport(selectedCategory, newTransaction, true);
+                TransactionReport(selectedCategory, newTransaction);
             }
         }
 
-        static void TransactionReport(Category selectedCategoryName, Transaction transactionInfo, bool isAdding)
+        static void TransactionReport(Category selectedCategoryName, Transaction transactionInfo)
         {
 
             decimal budget = selectedCategoryName.BudgetLimit;
@@ -343,27 +341,32 @@ namespace BudgetManagementSystem
                 return;
             }
 
-            Transaction transactionToRemove = transactions[0];
-            Console.WriteLine("Select the index of the transaction you want to remove: ");
-            string removeTransaction = Console.ReadLine();
-            if (int.TryParse(removeTransaction, out int removeTransactionInt))
+            Transaction transactionToRemove = null;
+
+            while (true)
             {
-                transactionToRemove = transactions[removeTransactionInt - 1];
-                transactions.RemoveAt(removeTransactionInt - 1);
-                AnsiConsole.MarkupLine($"[red]\ntransaction removed: {removeTransaction}\n[/]");
-            }
-            else
-            {
-                AnsiConsole.MarkupLine("[red]\nThe given index is not valid.\n[/]");
+                Console.WriteLine("Select the index of the transaction you want to remove: ");
+                string removeTransaction = Console.ReadLine();
+                if (int.TryParse(removeTransaction, out int removeTransactionInt) && removeTransactionInt > 0 && removeTransactionInt <= transactions.Count)
+                {
+                    transactionToRemove = transactions[removeTransactionInt - 1];
+                    transactions.RemoveAt(removeTransactionInt - 1);
+                    AnsiConsole.MarkupLine($"[red]\ntransaction removed: {removeTransaction}\n[/]");
+                    break;
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[red]\nThe given index is not valid.\n[/]");
+                    continue;
+                }
             }
 
 
-            TransactionReport(transactionToRemove.CategoryName, transactionToRemove, false);
+            TransactionReport(transactionToRemove.CategoryName, transactionToRemove);
         }
         static void ExportTransactions()
         {
 
-            // TODO: Refactor and add transaction report data
             string path = "budgettracker.csv";
 
             StringBuilder output = new StringBuilder();
