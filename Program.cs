@@ -176,11 +176,11 @@ namespace BudgetManagementSystem
 
             while (true)
             {
-                AnsiConsole.MarkupLine("[bold deepskyblue1]Please choose a category: [/]");
+                Console.WriteLine("\nPlease choose a category: ");
 
                 for (int i = 0; i < categories.Count; i++)
                 {
-                    AnsiConsole.MarkupLine($"[bold]{i + 1}. {categories[i].Name}[/]");
+                    Console.WriteLine($"{i + 1}. {categories[i].Name}");
 
                 }
 
@@ -221,7 +221,7 @@ namespace BudgetManagementSystem
 
             while (true)
             {
-                Console.WriteLine("Enter the transaction amount: ");
+                Console.WriteLine("\nEnter the transaction amount: ");
                 string amount = Console.ReadLine();
 
                 if (decimal.TryParse(amount, out decimalAmount))
@@ -295,46 +295,49 @@ namespace BudgetManagementSystem
         static void Budget()
         {
             // BudgetLimit
-            decimal transactionTotal = 0;
             Category selectedCategory = DisplayCategories();
             Console.WriteLine($"What is your budget for {selectedCategory.Name}?: ");
             string userBudget = Console.ReadLine();
 
-            foreach (Transaction item in transactions)
-            {
-                if (item.CategoryName.Name.ToString() == selectedCategory.Name)
-                {
-                    transactionTotal += item.Amount;
-
-                }
-            }
+            decimal transactionTotal = DynamicBudget(selectedCategory);
 
             if (decimal.TryParse(userBudget, out decimal budgetLimit))
             {
                 selectedCategory.BudgetLimit = budgetLimit;
                 decimal budgetTotal = budgetLimit - transactionTotal;
-                AnsiConsole.MarkupLine($"[green] Your budget for the {selectedCategory.Name} category is: ${budgetTotal}[/]");
+
+                AnsiConsole.MarkupLine($"[green] Your budget for the {selectedCategory.Name} category is: ${userBudget}[/]");
+                
+                if (transactionTotal > 0 && budgetTotal > 0)
+                {
+                    AnsiConsole.MarkupLine($"[green] You have ${budgetTotal} left to spend.[/]");
+                }
+                else if (budgetTotal < 0)
+                {
+                    AnsiConsole.MarkupLine($"[red] You are ${Math.Abs(budgetTotal)} over your budget.[/]");
+                }
+                else if (budgetTotal == 0)
+                {
+                    AnsiConsole.MarkupLine($"[yellow] Your budget is now ${budgetTotal}. You have reached your budget limit.[/]");
+                }
             }
 
 
         }
 
         // This method is needed for transactionreport, budget, and view budget
-        static void DynamicBudget(Category categoryBudget)
+        static decimal DynamicBudget(Category categoryBudget)
         {
+            decimal transactionTotal = 0;
+            foreach (Transaction item in transactions)
+            {
+                if (item.CategoryName.Name.ToString() == categoryBudget.Name)
+                {
+                    transactionTotal += item.Amount;
+                }
+            }
 
-            // decimal transactionTotal = 0;
-            // Category selectedCategory = DisplayCategories();
-            // foreach (Transaction item in transactions)
-            // {
-            //     if (item.CategoryName.Name.ToString() == selectedCategory.Name)
-            //     {
-            //         transactionTotal += item.Amount;
-
-            //         decimal budgetTotal = budgetLimit - transactionTotal;
-
-            //     }
-            // }
+            return transactionTotal;
         }
 
         static void ViewBudget()
@@ -342,7 +345,7 @@ namespace BudgetManagementSystem
             Console.WriteLine("========================================");
             foreach (Category categoryName in categories)
             {
-                AnsiConsole.MarkupLine($"[springgreen1]{categoryName.Name}: {categoryName.BudgetLimit}[/]");
+                AnsiConsole.MarkupLine($"[springgreen1]{categoryName.Name}: Budget: ${categoryName.BudgetLimit} | Amount spent: ${DynamicBudget(categoryName)}\n[/]");
             }
             Console.WriteLine("========================================");
 
