@@ -47,9 +47,6 @@ namespace BudgetManagementSystem
             new Category { Name = "Miscellaneous" }
         };
 
-        static decimal budgetLimit = new();
-
-
         static void Main()
         {
             bool exit = false;
@@ -170,6 +167,7 @@ namespace BudgetManagementSystem
             {
                 Console.WriteLine("\nPlease choose a category: ");
 
+
                 for (int i = 0; i < categories.Count; i++)
                 {
                     Console.WriteLine($"{i + 1}. {categories[i].Name}");
@@ -178,12 +176,13 @@ namespace BudgetManagementSystem
 
                 string userInput = Console.ReadLine();
 
-                if (int.TryParse(userInput, out int selectedCategory))
+                if (int.TryParse(userInput, out int selectedCategory) && selectedCategory > 0 && selectedCategory <= categories.Count)
                 {
                     return categories[selectedCategory - 1];
                 }
                 else
                 {
+                    AnsiConsole.MarkupLine("[red]\nThe given index is not valid. Please choose a number between 1 and 5.\n[/]");
                     continue;
                 }
             }
@@ -260,26 +259,19 @@ namespace BudgetManagementSystem
         {
 
             decimal budget = selectedCategoryName.BudgetLimit;
-            decimal amountSpent = transactionInfo.Amount;
+            decimal amountSpent = DynamicBudget(selectedCategoryName);
 
-            if (isAdding == true)
-            {
-                selectedCategoryName.RemainingBudget = budget - amountSpent;
-            }
-            else
-            {
-                selectedCategoryName.RemainingBudget = selectedCategoryName.RemainingBudget + amountSpent;
-            }
+            decimal remaining = budget - amountSpent;
 
             AnsiConsole.MarkupLine($"[green]Budget: {budget}[/]");
             AnsiConsole.MarkupLine($"[red]Amount spent: {amountSpent}[/]");
-            if (selectedCategoryName.RemainingBudget < 0)
+            if (remaining < 0)
             {
-                AnsiConsole.MarkupLine($"[red]Remaining: {selectedCategoryName.RemainingBudget}[/]");
+                AnsiConsole.MarkupLine($"[red]Remaining: {remaining}[/]");
             }
             else
             {
-                AnsiConsole.MarkupLine($"[yellow]Remaining: {selectedCategoryName.RemainingBudget}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Remaining: {remaining}[/]");
             }
 
         }
@@ -299,7 +291,7 @@ namespace BudgetManagementSystem
                 decimal budgetTotal = budgetLimit - transactionTotal;
 
                 AnsiConsole.MarkupLine($"[green] Your budget for the {selectedCategory.Name} category is: ${userBudget}[/]");
-                
+
                 if (transactionTotal > 0 && budgetTotal > 0)
                 {
                     AnsiConsole.MarkupLine($"[green] You have ${budgetTotal} left to spend.[/]");
@@ -345,6 +337,12 @@ namespace BudgetManagementSystem
 
         static void RemoveTransactions()
         {
+            if (transactions.Count == 0)
+            {
+                AnsiConsole.MarkupLine("[red]There are no transactions to remove.[/]");
+                return;
+            }
+
             Transaction transactionToRemove = transactions[0];
             Console.WriteLine("Select the index of the transaction you want to remove: ");
             string removeTransaction = Console.ReadLine();
@@ -356,7 +354,7 @@ namespace BudgetManagementSystem
             }
             else
             {
-                Console.WriteLine("\nThe given index is not valid.\n");
+                AnsiConsole.MarkupLine("[red]\nThe given index is not valid.\n[/]");
             }
 
 
@@ -380,16 +378,6 @@ namespace BudgetManagementSystem
                 output.AppendLine(csvData);
             }
 
-            header = "\nBudget";
-            output.AppendLine(header);
-            foreach (Category transactionCategory in categories)
-            {
-                string budget = $"{transactionCategory.Name}: {transactionCategory.BudgetLimit} \n";
-
-                output.AppendLine(budget);
-            }
-
-            // TransactionReport(transactionToRemove.CategoryName, transactionToRemove, false);
             AnsiConsole.MarkupLine("[green]CSV file was successfully created.[/]");
             File.AppendAllText(path, output.ToString());
 
