@@ -87,7 +87,7 @@ namespace BudgetManagementSystem
                         PromptUser();
                         break;
                     case 6:
-                        ExportTransactions(categories[0]);
+                        ExportTransactions();
                         PromptUser();
                         break;
                     case 7:
