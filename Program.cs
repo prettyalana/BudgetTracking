@@ -1,13 +1,5 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.IO.Pipelines;
-using System.Net;
-using System.Runtime;
-using System.Runtime.CompilerServices;
-using System.Runtime.ConstrainedExecution;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Transactions;
 using Spectre.Console;
 
 namespace BudgetManagementSystem
