@@ -109,8 +109,7 @@ namespace BudgetManagementSystem
                         Environment.Exit(0);
                         break;
                     default:
-                        AnsiConsole.MarkupLine("[red]Incorrect choice.[/]");
-                        AnsiConsole.MarkupLine("[red]Please make a choice between numbers 1-7.[/]");
+                        AnsiConsole.MarkupLine("[red]Invalid choice. Please select a number between 1 and 7.[/]");
                         continue;
                 }
             }
@@ -145,14 +144,9 @@ namespace BudgetManagementSystem
                 AnsiConsole.MarkupLine("[bold red]3. Remove a transaction[/]");
                 AnsiConsole.MarkupLine("[bold deepskyblue1]4. Set a budget[/]");
                 AnsiConsole.MarkupLine("[bold cyan]5. View budget[/]");
-                AnsiConsole.MarkupLine("[bold deeppink1]6. Export transaction data[/]");
-                AnsiConsole.MarkupLine("[bold magenta]7. Exit[/]");
+                AnsiConsole.MarkupLine("[bold lightpink1]6. Export transaction data[/]");
+                AnsiConsole.MarkupLine("[bold deeppink1]7. Exit[/]");
                 Console.WriteLine("========================================\n");
-            }
-
-            static void PrintSelectedOption(string selectedOption)
-            {
-                Console.WriteLine($"Selected option: {selectedOption}");
             }
 
             static void PromptUser()
@@ -180,19 +174,28 @@ namespace BudgetManagementSystem
         static Category DisplayCategories()
         {
 
-            Console.WriteLine("Please choose a category: ");
-            for (int i = 0; i < categories.Count; i++)
+            while (true)
             {
-                Console.WriteLine($"{i + 1}. {categories[i].Name}");
+                AnsiConsole.MarkupLine("[bold deepskyblue1]Please choose a category: [/]");
 
-            }
-            string userInput = Console.ReadLine();
-            if (int.TryParse(userInput, out int selectedCategory))
-            {
-                return categories[selectedCategory - 1];
+                for (int i = 0; i < categories.Count; i++)
+                {
+                    AnsiConsole.MarkupLine($"[bold]{i + 1}. {categories[i].Name}[/]");
+
+                }
+
+                string userInput = Console.ReadLine();
+
+                if (int.TryParse(userInput, out int selectedCategory))
+                {
+                    return categories[selectedCategory - 1];
+                }
+                else
+                {
+                    continue;
+                }
             }
 
-            return null;
         }
 
         static void AddTransactions()
@@ -319,7 +322,7 @@ namespace BudgetManagementSystem
         // This method is needed for transactionreport, budget, and view budget
         static void DynamicBudget(Category categoryBudget)
         {
-            
+
             // decimal transactionTotal = 0;
             // Category selectedCategory = DisplayCategories();
             // foreach (Transaction item in transactions)
