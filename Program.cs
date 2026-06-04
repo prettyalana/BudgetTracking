@@ -362,7 +362,7 @@ namespace BudgetManagementSystem
 
             TransactionReport(transactionToRemove.CategoryName, transactionToRemove);
         }
-        static void ExportTransactions(Category budgetAmount)
+        static void ExportTransactions()
         {
 
             try
@@ -371,13 +371,13 @@ namespace BudgetManagementSystem
 
                 StringBuilder output = new StringBuilder();
 
-                string header = "Description, Category, Budget, Amount Spent, Total, Date";
+                string header = "Description, Category, Amount, Date";
                 output.AppendLine(header);
 
                 for (int i = 0; i < transactions.Count; i++)
                 {
 
-                    string csvData = $"{transactions[i].Description}, {transactions[i].CategoryName.Name}, {budgetAmount.BudgetLimit}, {DynamicBudget(budgetAmount)}, {budgetAmount.BudgetLimit - DynamicBudget(budgetAmount)}, {transactions[i].Date}";
+                    string csvData = $"{transactions[i].Description}, {transactions[i].CategoryName.Name}, {transactions[i].Amount}, {transactions[i].Date}";
 
                     output.AppendLine(csvData);
                 }
