@@ -89,7 +89,7 @@ namespace BudgetManagementSystem
                         PromptUser();
                         break;
                     case 6:
-                        ExportTransactions();
+                        ExportTransactions(categories[0]);
                         PromptUser();
                         break;
                     case 7:
@@ -364,19 +364,19 @@ namespace BudgetManagementSystem
 
             TransactionReport(transactionToRemove.CategoryName, transactionToRemove);
         }
-        static void ExportTransactions()
+        static void ExportTransactions(Category budgetAmount)
         {
 
             string path = "budgettracker.csv";
 
             StringBuilder output = new StringBuilder();
 
-            string header = "Description, Amount, Category, Date";
+            string header = "Description, Category, Budget, Amount Spent, Total, Date";
             output.AppendLine(header);
             for (int i = 0; i < transactions.Count; i++)
             {
 
-                string csvData = $"{transactions[i].Description}, ${transactions[i].Amount}, {transactions[i].CategoryName.Name}, {transactions[i].Date}";
+                string csvData = $"{transactions[i].Description}, {transactions[i].CategoryName.Name}, {budgetAmount.BudgetLimit}, {DynamicBudget(budgetAmount)}, { budgetAmount.BudgetLimit - DynamicBudget(budgetAmount)}, {transactions[i].Date}";
 
                 output.AppendLine(csvData);
             }
