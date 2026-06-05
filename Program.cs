@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+// using System.Text.Json;
 using Spectre.Console;
 
 namespace BudgetManagementSystem
@@ -15,6 +16,8 @@ namespace BudgetManagementSystem
 
         public DateTime Date { get; init; }
 
+        public DateTime? UpdatedAt { get; set; }
+
     }
 
     public class Category
@@ -24,12 +27,6 @@ namespace BudgetManagementSystem
         public decimal BudgetLimit { get; set; }
 
     }
-
-    public class Budget
-    {
-
-    }
-
     class Program()
     {
 
@@ -47,6 +44,8 @@ namespace BudgetManagementSystem
         {
             bool exit = false;
 
+            // TODO: Implement data persistence
+            // LoadData();
             Greeting();
 
             while (!exit)
@@ -79,22 +78,28 @@ namespace BudgetManagementSystem
                         PromptUser();
                         break;
                     case 4:
-                        Budget();
+                        EditTransactions();
                         PromptUser();
                         break;
                     case 5:
-                        ViewBudget();
+                        Budget();
                         PromptUser();
                         break;
                     case 6:
-                        ExportTransactions();
+                        ViewBudget();
                         PromptUser();
                         break;
                     case 7:
+                        ExportTransactions();
+                        PromptUser();
+                        break;
+                    case 8:
+                        // TODO: Implement data persistence
+                        // SaveData();
                         Environment.Exit(0);
                         break;
                     default:
-                        AnsiConsole.MarkupLine("[red]Invalid choice. Please select a number between 1 and 7.[/]");
+                        AnsiConsole.MarkupLine("[red]Invalid choice. Please select a number between 1 and 8.[/]");
                         continue;
                 }
             }
@@ -127,10 +132,11 @@ namespace BudgetManagementSystem
                 AnsiConsole.MarkupLine("[bold yellow]1. See all transactions[/]");
                 AnsiConsole.MarkupLine("[bold green]2. Add a new transaction[/]");
                 AnsiConsole.MarkupLine("[bold red]3. Remove a transaction[/]");
-                AnsiConsole.MarkupLine("[bold deepskyblue1]4. Set a budget[/]");
-                AnsiConsole.MarkupLine("[bold cyan]5. View budget[/]");
-                AnsiConsole.MarkupLine("[bold lightpink1]6. Export transaction data[/]");
-                AnsiConsole.MarkupLine("[bold deeppink1]7. Exit[/]");
+                AnsiConsole.MarkupLine("[bold hotpink]4. Edit a transaction[/]");
+                AnsiConsole.MarkupLine("[bold deepskyblue1]5. Set a budget[/]");
+                AnsiConsole.MarkupLine("[bold cyan]6. View budget[/]");
+                AnsiConsole.MarkupLine("[bold pink1]7. Export transaction data[/]");
+                AnsiConsole.MarkupLine("[bold deeppink1]8. Exit[/]");
                 Console.WriteLine("========================================\n");
             }
 
@@ -141,11 +147,13 @@ namespace BudgetManagementSystem
 
         }
 
-        static void ViewTransactions()
+        static bool ViewTransactions()
         {
+
             if (transactions.Count == 0)
             {
                 AnsiConsole.MarkupLine("[red]No transactions have been added yet.[/]");
+                return true;
             }
             for (int i = 0; i < transactions.Count; i++)
             {
@@ -154,6 +162,8 @@ namespace BudgetManagementSystem
 
                 }
             }
+
+            return false;
         }
 
         static Category DisplayCategories()
@@ -331,11 +341,70 @@ namespace BudgetManagementSystem
 
         }
 
+        static void EditTransactions()
+        {
+
+
+            if (ViewTransactions())
+            {
+                return;
+            }
+
+            Transaction transactionToEdit = null;
+
+            while (true)
+            {
+                Console.WriteLine("Which transaction would you like to edit?");
+
+                string selectedTransaction = Console.ReadLine();
+
+                if (int.TryParse(selectedTransaction, out int selectedTransactionInt) && selectedTransactionInt > 0 && selectedTransactionInt <= transactions.Count)
+                {
+                    // Assign a new descripton
+                    Console.WriteLine("Input a new description: ");
+                    transactionToEdit = transactions[selectedTransactionInt - 1];
+                    string transactionDescription = Console.ReadLine();
+                    transactionToEdit.Description = transactionDescription;
+
+                    // Assign a new category
+                    Console.WriteLine("Choose a new category: ");
+                    transactionToEdit.CategoryName = DisplayCategories();
+
+                    while (true)
+                    {
+                        Console.WriteLine("Input a new Amount: ");
+                        string transactionAmount = Console.ReadLine();
+                        if (decimal.TryParse(transactionAmount, out decimal transactionAmountDecimal))
+                        {
+                            transactionToEdit.Amount = transactionAmountDecimal;
+                        }
+                        else
+                        {
+                            AnsiConsole.MarkupLine("[red]Invalid amount.[/]");
+                            continue;
+                        }
+                        break;
+                    }
+
+                }
+                else
+                {
+                    continue;
+                }
+
+                transactionToEdit.UpdatedAt = DateTime.Now;
+
+                AnsiConsole.MarkupLine($"[green]\ntransaction has been updated at: {transactionToEdit.UpdatedAt}\n[/]");
+
+                break;
+            }
+
+        }
+
         static void RemoveTransactions()
         {
-            if (transactions.Count == 0)
+            if (ViewTransactions())
             {
-                AnsiConsole.MarkupLine("[red]There are no transactions to remove.[/]");
                 return;
             }
 
