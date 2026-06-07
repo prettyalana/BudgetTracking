@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text;
-// using System.Text.Json;
+using System.Text.Json;
 using Spectre.Console;
 
 namespace BudgetManagementSystem
@@ -14,7 +14,7 @@ namespace BudgetManagementSystem
 
         public required Category CategoryName { get; set; }
 
-        public DateTime Date { get; init; }
+        public DateTime Date { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
 
@@ -22,7 +22,7 @@ namespace BudgetManagementSystem
 
     public class Category
     {
-        public required string Name { get; init; }
+        public required string Name { get; set; }
 
         public decimal BudgetLimit { get; set; }
 
@@ -40,12 +40,15 @@ namespace BudgetManagementSystem
             new Category { Name = "Miscellaneous" }
         };
 
+        static string transactionsFilePath = "transactions.json";
+        static string categoriesFilePath = "categories.json";
+
         static void Main()
         {
             bool exit = false;
 
-            // TODO: Implement data persistence
-            // LoadData();
+            // Data persistence
+            LoadData();
             Greeting();
 
             while (!exit)
@@ -94,8 +97,8 @@ namespace BudgetManagementSystem
                         PromptUser();
                         break;
                     case 8:
-                        // TODO: Implement data persistence
-                        // SaveData();
+                        // Data persistence
+                        SaveData();
                         Environment.Exit(0);
                         break;
                     default:
@@ -370,6 +373,7 @@ namespace BudgetManagementSystem
                     Console.WriteLine("Choose a new category: ");
                     transactionToEdit.CategoryName = DisplayCategories();
 
+                    // Assign a new amount
                     while (true)
                     {
                         Console.WriteLine("Input a new Amount: ");
@@ -462,6 +466,38 @@ namespace BudgetManagementSystem
 
 
 
+        }
+
+        static void SaveData()
+        {
+            string transactionJson = JsonSerializer.Serialize(transactions);
+            string categoriesJson = JsonSerializer.Serialize(categories);
+            File.WriteAllText(transactionsFilePath, transactionJson);
+            File.WriteAllText(categoriesFilePath, categoriesJson);
+        }
+
+        static bool LoadData()
+        {
+
+            if (File.Exists(transactionsFilePath) && File.Exists(categoriesFilePath))
+            {
+                string transactionString = File.ReadAllText(transactionsFilePath);
+                string categoryString = File.ReadAllText(categoriesFilePath);
+                List<Transaction> transactionsList = JsonSerializer.Deserialize<List<Transaction>>(transactionString);
+                List<Category> categoriesList = JsonSerializer.Deserialize<List<Category>>(categoryString);
+                transactions = transactionsList;
+                categories = categoriesList;
+
+                foreach (Transaction transaction in transactions)
+                {
+                    transaction.CategoryName = categories.Find(c => c.Name == transaction.CategoryName.Name);
+    
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
 
