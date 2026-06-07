@@ -62,7 +62,6 @@ namespace BudgetManagementSystem
                 }
                 else
                 {
-                    AnsiConsole.MarkupLine("[red]Invalid input. Please enter a number.[/]");
                 }
 
 

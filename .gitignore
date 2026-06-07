@@ -2,3 +2,6 @@
 /obj
 
 BudgetTracking.csproj.lscache
+transactions.json
+categories.json
+budgetracker.csv
