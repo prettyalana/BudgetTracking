@@ -337,7 +337,7 @@ namespace BudgetManagementSystem
             Console.WriteLine("========================================");
             foreach (Category categoryName in categories)
             {
-                AnsiConsole.MarkupLine($"[springgreen1]{categoryName.Name}: Budget: ${categoryName.BudgetLimit} | Amount spent: ${DynamicBudget(categoryName)}\n[/]");
+                AnsiConsole.MarkupLine($"[springgreen1]{categoryName.Name}: Budget: ${categoryName.BudgetLimit}[/] [white]|[/] [yellow] Amount spent: ${DynamicBudget(categoryName)}\n[/]");
             }
             Console.WriteLine("========================================");
 
