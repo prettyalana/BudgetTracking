@@ -398,7 +398,11 @@ namespace BudgetManagementSystem
                 transactionToEdit.UpdatedAt = DateTime.Now;
 
                 AnsiConsole.MarkupLine($"[green]\ntransaction has been updated at: {transactionToEdit.UpdatedAt}\n[/]");
-                TransactionReport(transactionToEdit.CategoryName, transactionToEdit);
+                
+                if (transactionToEdit.CategoryName.BudgetLimit > 0)
+                {
+                    TransactionReport(transactionToEdit.CategoryName, transactionToEdit);
+                }
 
                 break;
             }
