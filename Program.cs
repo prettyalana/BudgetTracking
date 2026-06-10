@@ -27,7 +27,7 @@ namespace BudgetManagementSystem
         public decimal BudgetLimit { get; set; }
 
     }
-    class Program()
+    class Program
     {
 
         static List<Transaction> transactions = new List<Transaction>();
