@@ -459,7 +459,7 @@ namespace BudgetManagementSystem
                     output.AppendLine(csvData);
                 }
 
-                File.AppendAllText(path, output.ToString());
+                File.WriteAllText(path, output.ToString());
                 AnsiConsole.MarkupLine("[green]CSV file was successfully created.[/]");
             }
             catch (Exception ex)
