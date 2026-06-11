@@ -437,7 +437,10 @@ namespace BudgetManagementSystem
             }
 
 
-            TransactionReport(transactionToRemove.CategoryName, transactionToRemove);
+            if (transactionToRemove.CategoryName.BudgetLimit > 0)
+            {
+                TransactionReport(transactionToRemove.CategoryName, transactionToRemove);
+            }
         }
         static void ExportTransactions()
         {
