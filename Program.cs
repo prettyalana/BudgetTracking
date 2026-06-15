@@ -6,27 +6,8 @@ using Spectre.Console;
 namespace BudgetManagementSystem
 {
 
-    public class Transaction
-    {
-        // Properties
-        public required string Description { get; set; }
-        public decimal Amount { get; set; }
-        public required Category CategoryName { get; set; }
-        public DateTime Date { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-
-    }
-
-    public class Category
-    {
-        public required string Name { get; set; }
-        public decimal BudgetLimit { get; set; }
-
-    }
-
     class Program
     {
-
         static List<Transaction> transactions = new List<Transaction>();
         static List<Category> categories = new()
         {
