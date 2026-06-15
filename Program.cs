@@ -11,11 +11,8 @@ namespace BudgetManagementSystem
         // Properties
         public required string Description { get; set; }
         public decimal Amount { get; set; }
-
         public required Category CategoryName { get; set; }
-
         public DateTime Date { get; set; }
-
         public DateTime? UpdatedAt { get; set; }
 
     }
@@ -23,10 +20,10 @@ namespace BudgetManagementSystem
     public class Category
     {
         public required string Name { get; set; }
-
         public decimal BudgetLimit { get; set; }
 
     }
+
     class Program
     {
 
@@ -398,7 +395,7 @@ namespace BudgetManagementSystem
                 transactionToEdit.UpdatedAt = DateTime.Now;
 
                 AnsiConsole.MarkupLine($"[green]\ntransaction has been updated at: {transactionToEdit.UpdatedAt}\n[/]");
-                
+
                 if (transactionToEdit.CategoryName.BudgetLimit > 0)
                 {
                     TransactionReport(transactionToEdit.CategoryName, transactionToEdit);
@@ -498,7 +495,7 @@ namespace BudgetManagementSystem
                 foreach (Transaction transaction in transactions)
                 {
                     transaction.CategoryName = categories.Find(c => c.Name == transaction.CategoryName.Name);
-    
+
                 }
 
                 return true;
