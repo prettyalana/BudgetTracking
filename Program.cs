@@ -20,64 +20,70 @@ namespace BudgetManagementSystem
 
         static string transactionsFilePath = "transactions.json";
         static string categoriesFilePath = "categories.json";
-
+        static bool exit = false;
         static void Main()
         {
-            bool exit = false;
 
             // Data persistence
             LoadData();
             Greeting();
 
-            while (!exit)
+            static bool runningProgram()
             {
-                DisplayMenu();
-
-                var userChoice = Console.ReadLine();
-
-                int.TryParse(userChoice, out int intUserChoice);
-
-                switch (intUserChoice)
+                while (!exit)
                 {
-                    case 1:
-                        ViewTransactions();
-                        PromptUser();
-                        break;
-                    case 2:
-                        AddTransactions();
-                        PromptUser();
-                        break;
-                    case 3:
-                        RemoveTransactions();
-                        PromptUser();
-                        break;
-                    case 4:
-                        EditTransactions();
-                        PromptUser();
-                        break;
-                    case 5:
-                        Budget();
-                        PromptUser();
-                        break;
-                    case 6:
-                        ViewBudget();
-                        PromptUser();
-                        break;
-                    case 7:
-                        ExportTransactions();
-                        PromptUser();
-                        break;
-                    case 8:
-                        // Data persistence
-                        SaveData();
-                        Environment.Exit(0);
-                        break;
-                    default:
-                        AnsiConsole.MarkupLine("[red]Invalid choice. Please select a number between 1 and 8.[/]");
-                        continue;
-                }
-            }
+                    DisplayMenu();
 
+                    var userChoice = Console.ReadLine();
+
+                    int.TryParse(userChoice, out int intUserChoice);
+
+                    switch (intUserChoice)
+                    {
+                        case 1:
+                            ViewTransactions();
+                            PromptUser();
+                            break;
+                        case 2:
+                            AddTransactions();
+                            PromptUser();
+                            break;
+                        case 3:
+                            RemoveTransactions();
+                            PromptUser();
+                            break;
+                        case 4:
+                            EditTransactions();
+                            PromptUser();
+                            break;
+                        case 5:
+                            Budget();
+                            PromptUser();
+                            break;
+                        case 6:
+                            ViewBudget();
+                            PromptUser();
+                            break;
+                        case 7:
+                            ExportTransactions();
+                            PromptUser();
+                            break;
+                        case 8:
+                            // Data persistence
+                            SaveData();
+                            Environment.Exit(0);
+                            break;
+                        default:
+                            AnsiConsole.MarkupLine("[red]Invalid choice. Please select a number between 1 and 8.[/]");
+                            continue;
+                    }
+
+                    
+                }
+
+                return false;
+            }
+            runningProgram();
             Console.ReadKey();
 
             static void Greeting()
