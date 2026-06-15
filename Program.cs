@@ -54,13 +54,7 @@ namespace BudgetManagementSystem
 
                 var userChoice = Console.ReadLine();
 
-                if (int.TryParse(userChoice, out int intUserChoice))
-                {
-                }
-                else
-                {
-                }
-
+                int.TryParse(userChoice, out int intUserChoice);
 
                 switch (intUserChoice)
                 {
