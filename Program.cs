@@ -271,15 +271,15 @@ namespace BudgetManagementSystem
 
             decimal remaining = budget - amountSpent;
 
-            AnsiConsole.MarkupLine($"[green]Budget: {budget}[/]");
-            AnsiConsole.MarkupLine($"[red]Amount spent: {amountSpent}[/]");
+            AnsiConsole.MarkupLine($"[green]Budget: ${budget}[/]");
+            AnsiConsole.MarkupLine($"[red]Amount spent: ${amountSpent}[/]");
             if (remaining < 0)
             {
-                AnsiConsole.MarkupLine($"[red]Remaining: {remaining}[/]");
+                AnsiConsole.MarkupLine($"[red]Remaining: ${remaining}[/]");
             }
             else
             {
-                AnsiConsole.MarkupLine($"[yellow]Remaining: {remaining}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Remaining: ${remaining}[/]");
             }
 
         }
