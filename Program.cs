@@ -28,6 +28,15 @@ namespace BudgetManagementSystem
             LoadData();
             Greeting();
 
+            const int VIEW_TRANSACTIONS = 1;
+            const int ADD_TRANSACTIONS = 2;
+            const int REMOVE_TRANSACTIONS = 3;
+            const int EDIT_TRANSACTIONS = 4;
+            const int BUDGET = 5;
+            const int VIEW_BUDGET = 6;
+            const int EXPORT_TRANSACTIONS = 7;
+            const int EXIT = 8;
+            
             static bool runningProgram()
             {
                 while (!exit)
@@ -40,35 +49,35 @@ namespace BudgetManagementSystem
 
                     switch (intUserChoice)
                     {
-                        case 1:
+                        case VIEW_TRANSACTIONS:
                             ViewTransactions();
                             PromptUser();
                             break;
-                        case 2:
+                        case ADD_TRANSACTIONS:
                             AddTransactions();
                             PromptUser();
                             break;
-                        case 3:
+                        case REMOVE_TRANSACTIONS:
                             RemoveTransactions();
                             PromptUser();
                             break;
-                        case 4:
+                        case EDIT_TRANSACTIONS:
                             EditTransactions();
                             PromptUser();
                             break;
-                        case 5:
+                        case BUDGET:
                             Budget();
                             PromptUser();
                             break;
-                        case 6:
+                        case VIEW_BUDGET:
                             ViewBudget();
                             PromptUser();
                             break;
-                        case 7:
+                        case EXPORT_TRANSACTIONS:
                             ExportTransactions();
                             PromptUser();
                             break;
-                        case 8:
+                        case EXIT:
                             // Data persistence
                             SaveData();
                             Environment.Exit(0);
